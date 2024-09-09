@@ -20,6 +20,7 @@
     "react-router-dom": "^6.26.1",
     "react-scripts": "^5.0.1",
     "react-select": "^5.8.0",
+    "react-slider": "^2.0.6",
     "react-tabs": "^6.0.2",
     "styled-components": "^6.1.13"
   },

@@ -13,7 +13,6 @@ export default function Neetpred() {
     <main>
       <Front />
       <Stats />
-      
       <News />
       <HowItWorks />
     </main>

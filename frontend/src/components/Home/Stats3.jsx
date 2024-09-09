@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
-import UniversityCardList from './Neetcard';
 import FundsTabs from './FundsTabs3';
 
 export default function NeetStats() {
-  const [categories, setCategories] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [quotas, setQuotas] = useState([]);
   
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -19,37 +18,35 @@ export default function NeetStats() {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    fetchInitialFilters();
+    fetchFilters();
   }, []);
 
-  const fetchInitialFilters = async () => {
+  const fetchFilters = async () => {
     try {
       const response = await axios.get('http://localhost:4000/api/Neetfilters');
-      setCategories([{ value: null, label: 'Select an option' }, ...response.data.categories.map(cat => ({ value: cat, label: cat }))]);
       setCourses([{ value: null, label: 'Select an option' }, ...response.data.courses.map(course => ({ value: course, label: course }))]);
+      setCategories([{ value: null, label: 'Select an option' }, ...response.data.categories.map(cat => ({ value: cat, label: cat }))]);
       setQuotas([{ value: null, label: 'Select an option' }, ...response.data.quotas.map(quota => ({ value: quota, label: quota }))]);
     } catch (error) {
       console.error('Error fetching initial filters:', error);
     }
   };
 
-  const fetchFilteredOptions = async () => {
+  const fetchFilteredOptions = async (currentFilters) => {
     try {
-      const queryParams = {
-        course: selectedCourse?.value || null,
-        category: selectedCategory?.value || null,
-      };
+      const response = await axios.get('http://localhost:4000/api/Neetfilters', {
+        params: currentFilters,
+      });
 
-      const response = await axios.get('http://localhost:4000/api/Neetfilters', { params: queryParams });
-
-      if (selectedCourse) {
-        setCategories([{ value: null, label: 'Select an option' }, ...response.data.filteredCategories.map(cat => ({ value: cat, label: cat }))]);
+      if (!currentFilters.category) {
+        setCategories([{ value: null, label: 'Select an option' }, ...response.data.categories.map(cat => ({ value: cat, label: cat }))]);
       }
-      if (selectedCategory) {
-        setQuotas([{ value: null, label: 'Select an option' }, ...response.data.filteredQuotas.map(quota => ({ value: quota, label: quota }))]);
+      if (!currentFilters.quota) {
+        setQuotas([{ value: null, label: 'Select an option' }, ...response.data.quotas.map(quota => ({ value: quota, label: quota }))]);
       }
     } catch (error) {
       console.error('Error fetching filtered options:', error);
+      setErrorMessage('Error fetching filter data. Please try again.');
     }
   };
 
@@ -57,13 +54,13 @@ export default function NeetStats() {
     setSelectedCourse(selectedOption);
     setSelectedCategory(null);
     setSelectedQuota(null);
-    fetchFilteredOptions();
+    fetchFilteredOptions({ course: selectedOption?.value });
   };
 
   const handleCategoryChange = (selectedOption) => {
     setSelectedCategory(selectedOption);
     setSelectedQuota(null);
-    fetchFilteredOptions();
+    fetchFilteredOptions({ course: selectedCourse?.value, category: selectedOption?.value });
   };
 
   const handleNeetSearch = async () => {
@@ -74,8 +71,8 @@ export default function NeetStats() {
 
     try {
       const response = await axios.post('http://localhost:4000/api/Neetpredict', {
-        maxRank: maxRank,
         course: selectedCourse?.value,
+        maxRank: maxRank,
         category: selectedCategory?.value,
         quota: selectedQuota?.value,
       });
@@ -95,10 +92,16 @@ export default function NeetStats() {
     setUniversities([]);
     setShowMostPopular(false);
     setErrorMessage('');
+    fetchFilters();
   };
 
   const isAnyNeetFilterSelected = () => {
-    return selectedCourse || selectedCategory || selectedQuota || maxRank.trim() !== '';
+    return (
+      selectedCourse ||
+      selectedCategory || 
+      selectedQuota || 
+      maxRank.trim() !== ''
+      );
   };
 
   return (
@@ -165,8 +168,8 @@ export default function NeetStats() {
 
       {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
       {showMostPopular && <FundsTabs universities={universities} />}
-      <UniversityCardList universities={universities} />
     </>
   );
 }
+
 
