@@ -149,7 +149,7 @@ app.post('/api/predict', async (req, res) => {
     query['Course Name'] = Course_Name.trim();
   }
   try {
-    const colleges = await collection.find(query).sort({ percentile: -1 }).limit(10).toArray();
+    const colleges = await collection.find(query).sort({ percentile: -1 }).limit(50).toArray();
     res.json(colleges);
   } catch (error) {
     console.error('Error occurred while fetching colleges', error);
@@ -182,7 +182,7 @@ app.post('/api/Neetpredict', async (req, res) => {
   }
 
   try {
-    const colleges = await neetCollection.find(query).sort({ min_rank: 1 }).limit(10).toArray();
+    const colleges = await neetCollection.find(query).sort({ max_rank: 1 }).limit(50).toArray();
     res.json(colleges);
   } catch (error) {
     console.error('Error occurred while fetching colleges from neetcoll', error);

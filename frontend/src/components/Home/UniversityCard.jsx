@@ -28,7 +28,6 @@ const UniversityCard = ({ name, city, branch, percentile, onApply }) => {
             </button>
           )}
         </CardTitle>
-        <CardSubtitle>City: {city}</CardSubtitle>
         <CardSubtitle>Branch: {branch}</CardSubtitle>
         <CardSubtitle>Percentile: {percentile}</CardSubtitle>
         {/* <CardButton onClick={onApply}>Apply Now</CardButton> */}
@@ -73,7 +72,7 @@ const UniversityCardList = ({ universities = [] }) => {
             <UniversityCard
               key={college['_id']}
               name={college['College Name']}
-              percentile={Math.floor(college['percentile'])} // Ensure displayed percentile is an integer
+              percentile={Math.floor(college['percentile'])} 
               branch={college['Branch Name']}
               city={college['District']}
               onApply={() => {

@@ -11,7 +11,7 @@ import {
 
 const NEETCard = ({ institute, course, category, minRank, maxRank, onApply }) => {
   const [showFullDetails, setShowFullDetails] = useState(false);
-  const [firstPart, rest] = institute.split(',', 2); // Assuming you want to shorten long institute names similarly
+  const [firstPart, rest] = institute.split(',', 2); 
 
   return (
     <Card>
@@ -43,10 +43,9 @@ const NEETCardList = ({ universities = [] }) => {
   const handleRangeChange = (range) => {
     setFilteredUniversities(
       universities.filter((college) => {
-        const roundedMinRank = Math.floor(college.min_rank);
         const roundedMaxRank = Math.floor(college.max_rank);
         return (
-          roundedMinRank >= range[0] &&
+          roundedMaxRank >= range[0] &&
           roundedMaxRank <= range[1]
         );
       })
@@ -55,15 +54,14 @@ const NEETCardList = ({ universities = [] }) => {
 
   useEffect(() => {
     if (universities.length > 0) {
-      const ranks = universities.flatMap(college => [Math.floor(college.min_rank), Math.floor(college.max_rank)]);
-      const maxRank = Math.max(...ranks);
-      handleRangeChange([0, maxRank]); // Set the range for rank filtering
+      const maxRanks = universities.map((college) => Math.floor(college.max_rank));
+      const maxxRank = Math.max(...maxRanks);
+      handleRangeChange([0, maxxRank]);
     }
   }, [universities]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      {/* Slider Section */}
       <div style={{ width: '100%', maxWidth: '600px', marginBottom: '20px' }}>
         <Slider universities={universities} onRangeChange={handleRangeChange} />
       </div>
@@ -76,10 +74,10 @@ const NEETCardList = ({ universities = [] }) => {
               institute={college['Allotted Institute']}
               course={college['Course']}
               category={college['Alloted Category']}
-              minRank={Math.floor(college['min_rank'])} // Ensure displayed rank is an integer
+              minRank={Math.floor(college['min_rank'])} 
               maxRank={Math.floor(college['max_rank'])}
               onApply={() => {
-                const url = "https://example.com"; // Replace with actual URL if available
+                const url = "https://example.com"; 
                 const formattedURL =
                   url.startsWith('http://') || url.startsWith('https://')
                     ? url
