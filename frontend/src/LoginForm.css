@@ -272,3 +272,21 @@
   margin-top: 5px;
   display: block;
 }
+
+.eye-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #060606;
+}
+
+.eye-icon.fa-eye {
+  color: #333;
+}
+
+.eye-icon.fa-eye-slash {
+  color: #333;
+}

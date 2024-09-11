@@ -174,7 +174,7 @@ const LoginForm = () => {
                                 <input
                                     type="text"
                                     name="username"
-                                    placeholder="Name"
+                                    placeholder="Username"
                                     value={signUpData.username}
                                     onChange={handleSignUpChange}
                                 />
@@ -221,13 +221,13 @@ const LoginForm = () => {
                                 <span>or use your account</span>
     
                                 <input
-                                    type="email"
-                                    name="email"
-                                    placeholder="Email"
-                                    value={signInData.email}
+                                    type="text"
+                                    name="username"
+                                    placeholder="Username"
+                                    value={signInData.username}
                                     onChange={handleSignInChange}
                                 />
-                                {signInErrors.email && <span className="error">{signInErrors.email}</span>}
+                                {signInErrors.username && <span className="error">{signInErrors.username}</span>}
     
                                 <input
                                     type="password"

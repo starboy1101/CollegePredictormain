@@ -337,23 +337,27 @@ async function addUserRecord(req, res) {
 
 async function loginByPost(req, res) {
   try {
-    const db = client.db("college_predictor");
     const userCollection = db.collection("User");
 
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!email || !password) {
+    if (!username || !password) {
       return res.status(400).send("Required fields are missing");
     }
 
-    const query = { email, password };
+    const query = { username, password };
     const userRef = await userCollection.findOne(query);
 
     if (!userRef) {
       return res.status(401).send("Invalid email or password");
     }
 
-    res.json(userRef);
+    // Return user data including role
+    res.json({ 
+      username: userRef.username,
+      email: userRef.email,
+      role: userRef.role || 'user' // Default to 'user' role if not specified
+    });
   } catch (err) {
     console.error("Error in loginByPost:", err);
     res.status(500).send("Error: " + err.message);
