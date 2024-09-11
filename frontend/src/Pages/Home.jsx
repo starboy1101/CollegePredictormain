@@ -7,10 +7,13 @@ import Quiz from "../components/Home/Quiz";
 import Stats from "../components/Home/Stats";
 import Stories from "../components/Home/Stories";
 import Trusted from "../components/Home/Trusted";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function Home() {
   return (
     <main>
+      <Navbar/>
       <Front />
       <Stats />
       {/*<Funds />*/}
@@ -20,6 +23,7 @@ export default function Home() {
       <News />
       <Stories />
       <Trusted />
+      <Footer/>
     </main>
   );
 }

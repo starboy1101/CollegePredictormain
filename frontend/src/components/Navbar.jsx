@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { logo } from "../assets/home";
 import Container from "./Container";
@@ -6,6 +6,47 @@ import Container from "./Container";
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isProfileOpen, setProfileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null); // Store user details
+
+  useEffect(() => {
+    // Example function to check if user is logged in and fetch user details
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch('/api/user/details', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  const handleLogin = () => {
+    // Logic for user login
+    // After successful login, fetch user details
+    fetchUserDetails();
+  };
+
+  const handleLogout = () => {
+    // Logic for user logout
+    localStorage.removeItem('token'); // Remove token
+    setIsLoggedIn(false);
+    setUser(null);
+  };
 
   return (
     <nav className="py-2 z-40">
@@ -50,7 +91,7 @@ function Navbar() {
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setDropdownOpen(false)}
                       >
-                        CET Predictor 
+                        CET Predictor
                       </Link>
                       <Link
                         to="/Neetpred"
@@ -79,11 +120,42 @@ function Navbar() {
             </div>
           </div>
 
-          <Link to="/login">
-            <div className="hidden md:block hover:bg-button-primary px-4 py-1 rounded-xl">
-              Log In / Sign up
+          {!isLoggedIn ? (
+            <Link to="/login">
+              <div className="hidden md:block hover:bg-button-primary px-4 py-1 rounded-xl">
+                Log In / Sign up
+              </div>
+            </Link>
+          ) : (
+            <div className="relative">
+              <button
+                onClick={() => setProfileOpen(!isProfileOpen)}
+                className="flex items-center hover:bg-button-primary px-4 py-2 rounded-xl"
+              >
+                <img
+                  src="/path/to/profile-icon.png"
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full"
+                />
+              </button>
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold">User Profile</h2>
+                    <p>Name: {user?.name}</p>
+                    <p>Email: {user?.email}</p>
+                    {/* Add more user details here */}
+                    <button
+                      onClick={handleLogout}
+                      className="mt-2 bg-red-500 text-white px-4 py-1 rounded"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          </Link>
+          )}
 
           <div className="-mr-2 flex md:hidden">
             <button
@@ -122,31 +194,31 @@ function Navbar() {
                 Admissions
               </Link>
               <div className="relative">
-                  <button
-                    onClick={() => setDropdownOpen(!isDropdownOpen)}
-                    className="hover:bg-primary-base hover:bg-button-primary hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                  >
-                    College Predictor
-                  </button>
-                  {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                      <Link
-                        to="/Collpred"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        CET Predictor 
-                      </Link>
-                      <Link
-                        to="/Neetpred"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        NEET Predictor
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={() => setDropdownOpen(!isDropdownOpen)}
+                  className="hover:bg-primary-base hover:bg-button-primary hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  College Predictor
+                </button>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                    <Link
+                      to="/Collpred"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      CET Predictor
+                    </Link>
+                    <Link
+                      to="/Neetpred"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      NEET Predictor
+                    </Link>
+                  </div>
+                )}
+              </div>
               <Link
                 to="/about"
                 className="hover:bg-primary-base hover:bg-button-primary hover:text-white block px-3 py-2 rounded-md text-base font-medium"
@@ -159,12 +231,25 @@ function Navbar() {
               >
                 Contact Us
               </Link>
-              <Link
-                to="/login"
-                className="hover:bg-primary-base bg-button-primary text-white block px-3 py-2 rounded-md text-base font-medium"
-              >
-                Log In/ Sign up
-              </Link>
+              {!isLoggedIn ? (
+                <Link
+                  to="/login"
+                  className="hover:bg-primary-base bg-button-primary text-white block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  Log In / Sign up
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setProfileOpen(!isProfileOpen)}
+                  className="flex items-center hover:bg-primary-base hover:bg-button-primary text-white block px-3 py-2 rounded-md text-base font-medium"
+                >
+                  <img
+                    src="/path/to/profile-icon.png"
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full"
+                  />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -174,3 +259,4 @@ function Navbar() {
 }
 
 export default Navbar;
+

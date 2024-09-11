@@ -7,14 +7,18 @@ import Quiz from "../components/Home/Quiz";
 import Stats from "../components/Home/Stats3";
 import Stories from "../components/Home/Stories";
 import Trusted from "../components/Home/Trusted";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function Neetpred() {
   return (
     <main>
+      <Navbar />
       <Front />
       <Stats />
       <News />
       <HowItWorks />
+      <Footer />
     </main>
   );
 }

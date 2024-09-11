@@ -4,6 +4,7 @@ import Admportal from "./Pages/admportal";
 import Collpred from "./Pages/Collpred";
 import LoginForm from "./LoginPage";
 import Neetpred from "./Pages/Neetpred";
+import AdminDashboard from "./Admindashboard";
 export default function MyRoutes() {
   return (
     <Routes>
@@ -13,6 +14,7 @@ export default function MyRoutes() {
       <Route path="/collpred" element={<Collpred />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/neetpred" element={<Neetpred />} />
+      <Route path="/admin" element={<AdminDashboard />} />
     </Routes>
   );
 }

@@ -2,8 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import { MongoClient } from 'mongodb';
 import bodyParser from 'body-parser';
+import multer from 'multer';   
+import csv from 'csv-parser';  
+import fs from 'fs';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import { Parser } from 'json2csv';
 
 const app = express();
 app.use(cors());
@@ -33,8 +37,97 @@ async function connectToDB() {
     process.exit(1);
   }
 }
-
 connectToDB();
+
+const upload = multer({ dest: 'uploads/' }); // Save uploaded files in 'uploads' folder
+
+async function insertCsvDataToDb(filePath, collection) {
+  const results = [];
+  return new Promise((resolve, reject) => {
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (data) => {
+        // Convert specific fields to integers (if present)
+        if (data.min_rank) data.min_rank = parseInt(data.min_rank, 10);
+        if (data.max_rank) data.max_rank = parseInt(data.max_rank, 10);
+        if (data.cutoff) data.cutoff = parseInt(data.cutoff, 10);
+        if (data.percentile) data.percentile = parseFloat(data.percentile); // Convert percentile to float
+
+        results.push(data);
+      })
+      .on('end', async () => {
+        try {
+          await collection.deleteMany({});
+          await collection.insertMany(results);
+          fs.unlinkSync(filePath); // Delete the file after processing
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      })
+      .on('error', (error) => reject(error));
+  });
+}
+
+
+// Route for uploading MHT CET dataset CSV
+app.post('/upload-mhtcet', upload.single('csvFile'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded');
+  }
+
+  try {
+    await insertCsvDataToDb(req.file.path, collection); // Insert data into MHT CET collection
+    res.status(200).json({ message: 'MHT CET dataset updated successfully' });
+  } catch (error) {
+    console.error('Error updating MHT CET dataset:', error);
+    res.status(500).json({ error: 'Failed to update MHT CET dataset' });
+  }
+});
+
+// Route for uploading NEET dataset CSV
+app.post('/upload-neet', upload.single('csvFile'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded');
+  }
+  try {
+    await insertCsvDataToDb(req.file.path, neetCollection); // Insert data into NEET collection
+    res.status(200).json({ message: 'NEET dataset updated successfully' });
+  } catch (error) {
+    console.error('Error updating NEET dataset:', error);
+    res.status(500).json({ error: 'Failed to update NEET dataset' });
+  }
+});
+
+app.get('/download-mhtcet', async (req, res) => {
+  try {
+    const data = await collection.find({}).toArray();
+    const json2csvParser = new Parser();
+    const csv = json2csvParser.parse(data);
+    res.header('Content-Type', 'text/csv');
+    res.attachment('mhtcet_dataset.csv');
+    res.send(csv);
+  } catch (error) {
+    console.error('Error downloading MHT CET dataset:', error);
+    res.status(500).json({ error: 'Failed to download MHT CET dataset' });
+  }
+});
+
+// Route to download NEET dataset
+app.get('/download-neet', async (req, res) => {
+  try {
+    const data = await neetCollection.find({}).toArray();
+    const json2csvParser = new Parser();
+    const csv = json2csvParser.parse(data);
+    res.header('Content-Type', 'text/csv');
+    res.attachment('neet_dataset.csv');
+    res.send(csv);
+  } catch (error) {
+    console.error('Error downloading NEET dataset:', error);
+    res.status(500).json({ error: 'Failed to download NEET dataset' });
+  }
+});
+
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',

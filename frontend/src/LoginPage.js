@@ -53,7 +53,6 @@ const LoginForm = () => {
         if (!signUpData.username.trim()) errors.username = 'Username is required';
         if (!signUpData.email.trim()) errors.email = 'Email is required';
         else if (!emailRegex.test(signUpData.email)) errors.email = 'Invalid email format';
-        else if (!signUpData.email.endsWith('.com')) errors.email = "Email must end with .com";
         if (!signUpData.password) errors.password = 'Password is required';
         else if (signUpData.password.length < 6) errors.password = 'Password must be at least 6 characters';
         if (!signUpData.mobile) errors.mobile = 'Mobile number is required';
@@ -68,7 +67,6 @@ const LoginForm = () => {
 
         if (!signInData.email) errors.email = 'Email is required';
         else if (!emailRegex.test(signInData.email)) errors.email = 'Invalid email format';
-        else if (!signUpData.email.endsWith('.com')) errors.email = "Email must end with .com";
         if (!signInData.password) errors.password = 'Password is required';
 
         return errors;
@@ -142,7 +140,11 @@ const LoginForm = () => {
                     const result = await response.json();
                     if (response.status === 200) {
                         alert('Login Successful');
-                        navigate('/');
+                        
+                        // Store the login state in localStorage or context
+                        localStorage.setItem('isLoggedIn', 'true'); // Example using localStorage
+
+                        navigate('/'); // Redirect to homepage or a protected route
                     } else {
                         alert('Login Failed');
                     }
@@ -155,6 +157,7 @@ const LoginForm = () => {
             }
         }
     };
+
   
     return (
         <div className="auth-page">
