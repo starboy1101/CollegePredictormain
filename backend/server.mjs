@@ -169,7 +169,7 @@ app.post('/verify-otp', (req, res) => {
 
 app.get('/api/filters', async (req, res) => {
   try {
-    const { city, course, branch } = req.query;
+    const { city, course, branch, categorie} = req.query;
     let query = {};
 
     if (city) {
@@ -184,14 +184,19 @@ app.get('/api/filters', async (req, res) => {
       query['Branch Name'] = branch;  
     }
 
+    if (categorie) {
+      query['Category'] = categorie;  
+    }
+
     const college_name = await collection.distinct('College Name', query);
     const branches = await collection.distinct('Branch Name', query);
     const categories = await collection.distinct('Category', query);
     const courses = await collection.distinct('Course Name', query);
+    const gender = await collection.distinct('Gender', query);
     const cityData = await collection.distinct('District', query);
     const links = await collection.distinct('Website URL', query);
 
-    res.json({ college_name, branches, categories, courses, city: cityData, links });
+    res.json({ college_name, branches, categories, gender, courses, city: cityData, links });
   } catch (error) {
     console.error('Error occurred while fetching filters', error);
     res.status(500).json({ error: 'An error occurred while fetching filters' });
@@ -213,7 +218,7 @@ app.get('/api/Neetfilters', async (req, res) => {
 });
 
 app.post('/api/predict', async (req, res) => {
-  const { percentile, city, Branch_Name, Category, Course_Name } = req.body;
+  const { percentile, city, Branch_Name, Category, Course_Name, gender } = req.body;
 
   const query = {};
 
@@ -224,7 +229,9 @@ app.post('/api/predict', async (req, res) => {
   if (percentile && percentile.trim() !== '') {
     const percentileNumber = parseFloat(percentile);
     if (!isNaN(percentileNumber)) {
-      query['percentile'] = { $lte: percentileNumber };
+      // Calculate the minimum percentile for the range
+      const minPercentile = percentileNumber - 5 < 0 ? 0 : percentileNumber - 5;
+      query['percentile'] = { $gte: minPercentile, $lte: 100 }; // Adjust the range here
     } else {
       return res.status(400).json({ error: 'Invalid percentile value' });
     }
@@ -234,15 +241,16 @@ app.post('/api/predict', async (req, res) => {
     query['Branch Name'] = Branch_Name.trim();
   }
 
+  if (gender && gender.trim() !== '' && gender !== '-- select an option --') {
+    query['Gender'] = gender.trim();
+  }
+
   if (Category && Category.trim() !== '' && Category !== '-- select an option --') {
     query['Category'] = Category.trim();
   }
 
-  if (Course_Name && Course_Name.trim() !== '' && Course_Name !== '-- select an option --') {
-    query['Course Name'] = Course_Name.trim();
-  }
   try {
-    const colleges = await collection.find(query).sort({ percentile: -1 }).limit(50).toArray();
+    const colleges = await collection.find(query).sort({ percentile: -1 }).toArray();
     res.json(colleges);
   } catch (error) {
     console.error('Error occurred while fetching colleges', error);

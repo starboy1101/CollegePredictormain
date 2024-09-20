@@ -8,7 +8,7 @@ export default function Stats() {
   const [branches, setBranches] = useState([]);
   const [categories, setCategories] = useState([]);
   const [city, setCity] = useState([]);
-  const [genders, setGenders] = useState([]);
+  const [gender, setGender] = useState([]);
 
   const [selectedCity, setSelectedCity] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -32,6 +32,7 @@ export default function Stats() {
       setCourses([{ value: null, label: 'Select an option' }, ...response.data.courses.map(course => ({ value: course, label: course }))]);
       setBranches([{ value: null, label: 'Select an option' }, ...response.data.branches.map(branch => ({ value: branch, label: branch }))]);
       setCategories([{ value: null, label: 'Select an option' }, ...response.data.categories.map(category => ({ value: category, label: category }))]);
+      setGender([{ value: null, label: 'Select an option' }, ...response.data.gender.map(gender => ({ value: gender, label: gender }))]);
     } catch (error) {
       console.error('Error fetching filters:', error);
     }
@@ -49,6 +50,9 @@ export default function Stats() {
       if (!currentFilters.branch) {
         setBranches([{ value: null, label: 'Select an option' }, ...response.data.branches.map(branch => ({ value: branch, label: branch }))]);
       }
+      if (!currentFilters.gender) {
+        setGender([{ value: null, label: 'Select an option' }, ...response.data.gender.map(gender => ({ value: gender, label: gender }))]);
+      }
       if (!currentFilters.category) {
         setCategories([{ value: null, label: 'Select an option' }, ...response.data.categories.map(category => ({ value: category, label: category }))]);
       }
@@ -62,6 +66,7 @@ export default function Stats() {
     setSelectedCity(selectedOption);
     setSelectedCourse(null);
     setSelectedBranch(null);
+    setSelectedGender(null);
     setSelectedCategory(null);
     fetchFilteredOptions({ city: selectedOption.value });
   };
@@ -69,14 +74,27 @@ export default function Stats() {
   const handleCourseChange = (selectedOption) => {
     setSelectedCourse(selectedOption);
     setSelectedBranch(null);
+    setSelectedGender(null);
     setSelectedCategory(null);
     fetchFilteredOptions({ city: selectedCity?.value, course: selectedOption.value });
   };
 
   const handleBranchChange = (selectedOption) => {
     setSelectedBranch(selectedOption);
+    setSelectedGender(null);
     setSelectedCategory(null);
     fetchFilteredOptions({ city: selectedCity?.value, course: selectedCourse?.value, branch: selectedOption.value });
+  };
+
+  const handleGenderChange = (selectedOption) => {
+    setSelectedGender(selectedOption);
+    setSelectedCategory(null);
+    fetchFilteredOptions({
+      city: selectedCity?.value,
+      course: selectedCourse?.value,
+      branch: selectedBranch?.value,
+      gender: selectedOption.value,
+    });
   };
 
   const handleSearch = async () => {
@@ -91,6 +109,7 @@ export default function Stats() {
         percentile: percentile,
         Branch_Name: selectedBranch?.value,
         Category: selectedCategory?.value,
+        gender: selectedGender?.value,
         Course_Name: selectedCourse?.value,
       });
       setUniversities(response.data);
@@ -162,12 +181,23 @@ export default function Stats() {
 
         <div className="w-full">
           <Select
+            options={gender}
+            placeholder="Select Gender"
+            classNamePrefix="react-select"
+            value={selectedGender}
+            onChange={handleGenderChange}
+            isDisabled={!selectedBranch}
+          />
+        </div>
+
+        <div className="w-full">
+          <Select
             options={categories}
             placeholder="Select Category"
             classNamePrefix="react-select"
             value={selectedCategory}
             onChange={(option) => setSelectedCategory(option)}
-            isDisabled={!selectedBranch}
+            isDisabled={!selectedGender}
           />
         </div>
 
