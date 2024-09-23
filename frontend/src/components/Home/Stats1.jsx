@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import FundsTabs from './FundsTabs2';
+import jsPDF from 'jspdf';
 
 export default function Stats() {
   const [courses, setCourses] = useState([]);
