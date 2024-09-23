@@ -248,10 +248,14 @@ app.post('/api/predict', async (req, res) => {
   if (Category && Category.trim() !== '' && Category !== '-- select an option --') {
     query['Category'] = Category.trim();
   }
+  if (Course_Name && Course_Name.trim() !== '' && Course_Name !== '-- select an option --') {
+    query['Course Name'] = Course_Name.trim();
+  }
 
   try {
     const colleges = await collection.find(query).sort({ percentile: -1 }).toArray();
-    res.json(colleges);
+    const uniqueColleges = Array.from(new Map(colleges.map(college => [college['College Name'], college])).values());
+    res.json(uniqueColleges);
   } catch (error) {
     console.error('Error occurred while fetching colleges', error);
     res.status(500).json({ error: 'An error occurred while fetching colleges' });
