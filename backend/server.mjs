@@ -1,33 +1,49 @@
 import express from 'express';
 import cors from 'cors';
 import { MongoClient } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import bodyParser from 'body-parser';
-import multer from 'multer';   
+import multer from 'multer'; 
+import path from 'path'; 
+import { fileURLToPath } from 'url';
 import csv from 'csv-parser';  
 import fs from 'fs';
-import nodemailer from 'nodemailer';
-import crypto from 'crypto';
 import { Parser } from 'json2csv';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import authenticateToken from './authMiddleware.js';
+import portfinder from 'portfinder';
 
+dotenv.config();
+const objectId = ObjectId.createFromTime(Math.floor(Date.now() / 1000));
+const port = process.env.PORT || 4000;
 const app = express();
+app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
-const port = process.env.PORT || 4000;
 
 const uri = 'mongodb://localhost:27017';
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(uri, { useNewUrlParser: true});
 let collection;
+let usersCollection;
 let recommendedCollegesCollection;
 let neetCollection;
-let users = {};
-let otps = {};
-
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
 
 async function connectToDB() {
   try {
     await client.connect();
     console.log("Connected to MongoDB");
     const db = client.db('college_predictor');
+    usersCollection = db.collection('User');
     collection = db.collection('Colleges');
     recommendedCollegesCollection = db.collection('Recommended');
     neetCollection = db.collection('NeetPredictor');
@@ -39,7 +55,54 @@ async function connectToDB() {
 }
 connectToDB();
 
-const upload = multer({ dest: 'uploads/' }); // Save uploaded files in 'uploads' folder
+app.post('/api/register', async (req, res) => {
+  try {
+    const newUser = req.body;
+    const user = await usersCollection.insertOne(newUser);
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/login', async (req, res) => {
+  const { email, password, type } = req.body;
+  try {
+    const user = await usersCollection.findOne({ email, password, type });
+    if (user) {
+      // Create a JWT token
+      const token = jwt.sign(
+        { userId: user._id, userType: user.type },
+        process.env.JWT_SECRET || 'yourSecretKey', // Use environment variable
+        { expiresIn: '1h' } // Token expiration time
+      );
+
+      // Send the token and user data to the frontend
+      res.json({ success: true, token, user });
+    } else {
+      res.json({ success: false, message: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error logging in' });
+  }
+});
+
+app.get('/api/user',async (req, res) => { 
+  try {
+    const user = await usersCollection.findOne({ _id: new objectId(req.user.userId) });
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching user' });
+  }
+});
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, 'uploads');
 
 async function insertCsvDataToDb(filePath, collection) {
   const results = [];
@@ -125,45 +188,6 @@ app.get('/download-neet', async (req, res) => {
   } catch (error) {
     console.error('Error downloading NEET dataset:', error);
     res.status(500).json({ error: 'Failed to download NEET dataset' });
-  }
-});
-
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-      user: 'your-email@gmail.com',
-      pass: 'your-password',
-  },
-});
-
-app.post('/forgot-password', (req, res) => {
-  const { email } = req.body;
-  const otp = crypto.randomInt(100000, 999999); 
-  otps[email] = otp;
-
-  transporter.sendMail({
-      from: 'your-email@gmail.com',
-      to: email,
-      subject: 'Password Reset OTP',
-      text: `Your OTP is ${otp}`,
-  }, (error, info) => {
-      if (error) {
-          return res.status(500).json({ message: 'Error sending OTP' });
-      }
-      res.json({ message: 'OTP sent' });
-  });
-});
-
-app.post('/verify-otp', (req, res) => {
-  const { email, otp, newPassword } = req.body;
-
-  if (otps[email] && otps[email] === parseInt(otp, 10)) {
-      users[email] = newPassword;
-      delete otps[email]; 
-      res.json({ message: 'Password reset successful' });
-  } else {
-      res.status(400).json({ message: 'Invalid OTP' });
   }
 });
 
@@ -325,83 +349,65 @@ app.get('/api/recommended', async (req, res) => {
   }
 });
 
-
-async function addUserRecord(req, res) {
+app.get('/api/students', async (req, res) => {
   try {
-    const db = client.db("college_predictor");
-    const userCollection = db.collection("User");
-
-    const { username, password, email, mobile } = req.body;
-
-    if (!username || !password || !email) {
-      return res.status(400).send("Required fields are missing");
-    }
-
-    const inputDoc = { username, password, email, mobile };
-
-    await userCollection.insertOne(inputDoc);
-    res.json({ operation: "success" });
-  } catch (err) {
-    console.error("Error in addUserRecord:", err);
-    res.status(500).send("Error: " + err.message);
-  }
-}
-
-async function loginByPost(req, res) {
-  try {
-    const userCollection = db.collection("User");
-
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).send("Required fields are missing");
-    }
-
-    const query = { username, password };
-    const userRef = await userCollection.findOne(query);
-
-    if (!userRef) {
-      return res.status(401).send("Invalid email or password");
-    }
-
-    // Return user data including role
-    res.json({ 
-      username: userRef.username,
-      email: userRef.email,
-      role: userRef.role || 'user' // Default to 'user' role if not specified
-    });
-  } catch (err) {
-    console.error("Error in loginByPost:", err);
-    res.status(500).send("Error: " + err.message);
-  }
-}
-
-app.post('/addtodo', async (req, res) => {
-  try {
-    const db = client.db("mydb");
-    const contactUsCollection = db.collection("contactus");
-
-    const { name, email, description } = req.body;
-
-    if (!name || !email || !description) {
-      return res.status(400).send("Required fields are missing");
-    }
-
-    const contactData = { name, email, description };
-
-    await contactUsCollection.insertOne(contactData);
-    res.status(200).json({ operation: "success" });
+    const students = await usersCollection.find({ type: 'student' }).toArray();
+    res.json(students);
   } catch (error) {
-    console.error("Error in addtodo:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+app.delete('/api/students/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await usersCollection.deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+    res.json({ success: true, message: 'Student deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post("/addUser", addUserRecord);
-app.post("/login-by-post", loginByPost);
-
-app.listen(4000, () => {
-  console.log("Server started on port 4000");
+app.get('/api/college-users', async (req, res) => {
+  try {
+    const collegeUsers = await usersCollection.find({ type: "college" }).toArray();
+    const collegeUserDetails = await Promise.all(collegeUsers.map(async (user) => {
+      const courses = await coursesCollection.find({ college: user.college }).toArray();
+      return { user, courses };
+    }));
+    res.status(200).json(collegeUserDetails);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching college users and courses', error });
+  }
 });
 
+app.get('/api/student-users', async (req, res) => {
+  try {
+    const studentUsers = await usersCollection.find({ type: "student" }).toArray();
+    const studentUserDetails = await Promise.all(studentUsers.map(async (user) => {
+      const purchases = await boughtCoursesCollection.find({ 'user._id': user._id }).toArray();
+      return { user, purchases };
+    }));
+    res.status(200).json(studentUserDetails);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching student users and purchases', error });
+  }
+});
+
+app.get('/config', (req, res) => {
+  res.json({ apiUrl: `http://localhost:${port}` });
+});
+
+
+portfinder.getPortPromise()
+  .then((port) => {
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error(err);
+  });
 // changes pushed

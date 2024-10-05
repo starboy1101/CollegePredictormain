@@ -17,7 +17,7 @@ export default function News() {
   const [visibleCount, setVisibleCount] = useState(2); 
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/recommended")
+    fetch("http://localhost:8000/api/recommended")
       .then((response) => response.json())
       .then((data) => {
         const collegesWithImages = data.map((college, index) => ({

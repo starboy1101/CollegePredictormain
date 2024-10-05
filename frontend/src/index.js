@@ -4,15 +4,17 @@ import "./index.css";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import ErrorBoundary from './ErrorBoundary';
+import { AuthProvider } from './context/AuthContext';
 
 ReactDOM.render(
   <ErrorBoundary>
     <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <AuthProvider> 
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AuthProvider>
     </React.StrictMode>
-  </ErrorBoundary>,  // This closing tag was incorrectly written
+  </ErrorBoundary>, 
   document.getElementById("root")
 );
-

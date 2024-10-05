@@ -94,13 +94,3 @@ const UniversityCardList = ({ universities = [] }) => {
 };
 
 export default UniversityCardList;
-
-
-
-
-
-
-
-
-
-

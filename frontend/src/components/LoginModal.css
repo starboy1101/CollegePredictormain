@@ -1,0 +1,115 @@
+.login-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  transform: translateY(0);
+}
+
+.login-modal h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+}
+
+.login-type {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.login-type label {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.login-type input[type="radio"] {
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.login-form input:focus {
+  border-color: #ff9800;
+  outline: none;
+}
+
+.login-form button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #e68a00;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.login-modal p {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #007BFF;
+  cursor: pointer;
+  text-decoration: underline;
+  text-align: center;
+}
+
+.login-modal p:hover {
+  color: #0056b3;
+}
+
+.login-modal h2::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 4px;
+  background-color: #10095b;
+  margin: 0.5rem auto;
+  border-radius: 2px;
+}
+
+@media (max-width: 600px) {
+  .login-modal {
+    padding: 1rem;
+  }
+
+  .login-modal h2 {
+    font-size: 1.5rem;
+  }
+
+  .login-form input,
+  .login-form button {
+    font-size: 0.9rem;
+  }
+}

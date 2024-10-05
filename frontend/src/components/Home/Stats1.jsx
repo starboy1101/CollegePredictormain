@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
 import FundsTabs from './FundsTabs2';
-import jsPDF from 'jspdf';
+import PopupMessage from './PopupMessage';
 
 export default function Stats() {
   const [courses, setCourses] = useState([]);
@@ -21,6 +21,7 @@ export default function Stats() {
   const [universities, setUniversities] = useState([]);
   const [showMostPopular, setShowMostPopular] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     fetchFilters(); 
@@ -28,7 +29,7 @@ export default function Stats() {
 
   const fetchFilters = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/filters');
+      const response = await axios.get('http://localhost:8000/api/filters');
       setCity([{ value: null, label: 'Select an option' }, ...response.data.city.map(city => ({ value: city, label: city }))]);
       setCourses([{ value: null, label: 'Select an option' }, ...response.data.courses.map(course => ({ value: course, label: course }))]);
       setBranches([{ value: null, label: 'Select an option' }, ...response.data.branches.map(branch => ({ value: branch, label: branch }))]);
@@ -41,7 +42,7 @@ export default function Stats() {
 
   const fetchFilteredOptions = async (currentFilters) => {
     try {
-      const response = await axios.get('http://localhost:4000/api/filters', {
+      const response = await axios.get('http://localhost:8000/api/filters', {
         params: currentFilters,
       });
 
@@ -105,7 +106,7 @@ export default function Stats() {
     }
 
     try {
-      const response = await axios.post('http://localhost:4000/api/predict', {
+      const response = await axios.post('http://localhost:8000/api/predict', {
         city: selectedCity?.value,
         percentile: percentile,
         Branch_Name: selectedBranch?.value,
@@ -116,9 +117,18 @@ export default function Stats() {
       setUniversities(response.data);
       setShowMostPopular(true);
       setErrorMessage('');
+
+      if (response.data.length === 0) {
+        setShowPopup(true);
+        setTimeout(() => 3000);
+      }
     } catch (error) {
       console.error('Error fetching colleges:', error);
     }
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false); // Close the popup
   };
 
   const handleClearFilters = () => {
@@ -230,7 +240,10 @@ export default function Stats() {
       </section>
 
       {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
-      {showMostPopular && <FundsTabs universities={universities} />}
+      {showMostPopular && <FundsTabs universities={universities} percentile={percentile} />}
+      {showPopup && (
+        <PopupMessage message="No colleges found matching your criteria." onClose={handleClosePopup} />
+      )}
     </>
   );
 }

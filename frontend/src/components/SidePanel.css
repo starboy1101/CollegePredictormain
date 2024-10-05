@@ -1,0 +1,48 @@
+/* SidePanel.css */
+.fixed {
+  width: 300px;
+  height: 100vh;
+  transition: transform 0.3s ease-in-out;
+}
+
+.shadow-lg {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+input {
+  background-color: white;
+  border: 1px solid #ddd;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+}
+
+.fixed {
+  transition: transform 0.3s ease;
+}
+
+.bg-gray-100 {
+  background-color: #f7fafc; /* Light gray background */
+}
+
+/* Custom scrollbar styles */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Track color */
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888; /* Thumb color */
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Thumb hover color */
+}

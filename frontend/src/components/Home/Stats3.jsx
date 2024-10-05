@@ -23,7 +23,7 @@ export default function NeetStats() {
 
   const fetchFilters = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/Neetfilters');
+      const response = await axios.get('http://localhost:8000/api/Neetfilters');
       setCourses([{ value: null, label: 'Select an option' }, ...response.data.courses.map(course => ({ value: course, label: course }))]);
       setCategories([{ value: null, label: 'Select an option' }, ...response.data.categories.map(cat => ({ value: cat, label: cat }))]);
       setQuotas([{ value: null, label: 'Select an option' }, ...response.data.quotas.map(quota => ({ value: quota, label: quota }))]);
@@ -34,7 +34,7 @@ export default function NeetStats() {
 
   const fetchFilteredOptions = async (currentFilters) => {
     try {
-      const response = await axios.get('http://localhost:4000/api/Neetfilters', {
+      const response = await axios.get('http://localhost:8000/api/Neetfilters', {
         params: currentFilters,
       });
 
@@ -70,7 +70,7 @@ export default function NeetStats() {
     }
 
     try {
-      const response = await axios.post('http://localhost:4000/api/Neetpredict', {
+      const response = await axios.post('http://localhost:8000/api/Neetpredict', {
         course: selectedCourse?.value,
         maxRank: maxRank,
         category: selectedCategory?.value,

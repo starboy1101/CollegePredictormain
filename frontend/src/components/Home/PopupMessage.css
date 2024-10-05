@@ -1,0 +1,47 @@
+/* Overlay to cover the whole screen */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    z-index: 1000; /* Ensures it stays on top */
+  }
+  
+  /* Popup message box */
+  .popup {
+    background-color: white; /* White background */
+    padding: 20px; /* Padding inside the popup */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    max-width: 400px; /* Max width for the popup */
+    width: 100%; /* Full width on small screens */
+    text-align: center; /* Center text inside */
+  }
+  
+  /* Message text styling */
+  .message {
+    margin: 0 0 20px; /* Margin below the message */
+    font-size: 16px; /* Font size for the message */
+  }
+  
+  /* Close button styling */
+  .close-button {
+    background-color: #007bff; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* Remove default border */
+    padding: 10px 15px; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners for the button */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition on hover */
+  }
+  
+  /* Change button color on hover */
+  .close-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  

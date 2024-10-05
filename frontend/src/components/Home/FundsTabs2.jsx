@@ -1,13 +1,16 @@
-import React, { useState, useRef  } from "react";
+import React, { useState, useRef,useEffect  } from "react";
 import { Tab, Tabs, TabPanel } from "react-tabs";
+import PopupMessage from './PopupMessage';
 import "react-tabs/style/react-tabs.css";
 import FundCards from "./UniversityCard";
 import SectionTitle from "./SectionTitle";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import "./PDFPreviewModal.css";
 
-export default function FundsTabs({ universities }) {
+export default function FundsTabs({ universities, percentile }) {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [message, setMessage] = useState('');
   const docRef = useRef(null);
 
   const selectedUniversity = universities[0];
@@ -16,6 +19,16 @@ export default function FundsTabs({ universities }) {
   const newLogo = `${process.env.PUBLIC_URL}/VidyarthiMitra.org Logo4.png`; // Update with your new logo path
 
   const handleGeneratePDF = () => {
+    if (universities.length === 0) {
+      setMessage('No colleges found to preview PDF');
+
+      setTimeout(() => {
+        setMessage('');
+      }, 3000);
+
+      return; 
+    }
+
     const doc = new jsPDF('p', 'pt', 'a4');
     docRef.current = doc;
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -29,15 +42,14 @@ export default function FundsTabs({ universities }) {
       const title = 'India’s Leading Educational Web Portal & App';
       const centerX = pageWidth / 2;
     
-      // Set color to black for the entire title
       doc.setTextColor(0, 0, 0); 
-      doc.text('India’s Leading ', centerX - 169, 70); // Adjust position as needed
-      // Change color for "Educational"
+      doc.text('India’s Leading ', centerX - 169, 70);
+
       doc.setTextColor(255, 0, 0);
-      doc.text('Educational', centerX - 55, 70); // Adjust position as needed
-      // Reset color to black for the rest of the title
+      doc.text('Educational', centerX - 55, 70);
+
       doc.setTextColor(0, 0, 0);
-      doc.text('        Web Portal & App', centerX ,70); // Adjust position as needed
+      doc.text('        Web Portal & App', centerX ,70); 
     
       doc.addImage(newLogo, 'PNG', centerX - 145, 75, 300, 85);
     
@@ -47,25 +59,22 @@ export default function FundsTabs({ universities }) {
       const subtitle2 = 'Mock Exams | Jobs | Skills | India | Abroad';
       const subtitleY = 170;
     
-      doc.setTextColor(0, 0, 0); // Black
+      doc.setTextColor(0, 0, 0); 
       doc.setFont(undefined, 'normal');
       doc.text(subtitle1, centerX - doc.getTextWidth(subtitle1, { size: 14 }) / 2, subtitleY);
-    
-      // Set font and color for "Mock Exams"
-      doc.setTextColor(255, 0, 0); // Red
+  
+      doc.setTextColor(255, 0, 0); 
       doc.setFont(undefined, 'normal');
       doc.text('Mock Exams', centerX - doc.getTextWidth(subtitle2, { size: 14 }) / 2, subtitleY + 15);
-    
-      // Set font and color for the rest of subtitle2
-      doc.setTextColor(0, 0, 0); // Black
+
+      doc.setTextColor(0, 0, 0); 
       doc.setFont(undefined, 'normal');
       doc.text(' | Jobs | Skills | India | ', centerX - doc.getTextWidth(subtitle2, { size: 14 }) / 2 + doc.getTextWidth('Mock Exams', { size: 14 }), subtitleY + 15);
-    
-      // Set font and color for "Abroad"
-      doc.setTextColor(255, 0, 0); // Red
+
+      doc.setTextColor(255, 0, 0);
       doc.setFont(undefined, 'normal');
-      doc.text('Abroad', centerX + 87, subtitleY + 15); // Adjust the position if needed
-      
+      doc.text('Abroad', centerX + 87, subtitleY + 15);
+
       doc.setTextColor(0, 0, 0);
       doc.text('Web: www.vidyarthimitra.org | Ph. +91 77200 25900;', centerX - doc.getTextWidth('Web: www.vidyarthimitra.org | Ph. +91 77200 25900;', { size: 12 }) / 2, subtitleY + 30);
       
@@ -80,7 +89,7 @@ export default function FundsTabs({ universities }) {
       doc.text(`Student Name: Rakhi`, 40, subtitleY + 75);
       doc.text(`Course Preferences: ${selectedUniversity['Branch Name']}`, 40, subtitleY + 75 + lineHeight);
       doc.text(`City Preference: ${selectedUniversity['District']}`, 40, subtitleY + 75 + lineHeight * 2);
-      doc.text(`MHT-CET Score: ${selectedUniversity['percentile']}`, 40, subtitleY + 75 + lineHeight * 3);
+      doc.text(`MHT-CET Score: ${percentile}`, 40, subtitleY + 75 + lineHeight * 3);
       doc.setFont(undefined, 'normal');
       
       const preferencesTitle = `${selectedUniversity['District']} College Preferences List`;
@@ -210,24 +219,23 @@ export default function FundsTabs({ universities }) {
             >
               Preview PDF
             </button>
+            <PopupMessage message={message} onClose={() => setMessage('')} />
           </div>
         </div>
         <TabPanel>
           <div className="flex justify-center">
             {universities.length > 0 ? (
               <FundCards universities={universities} />
-            ) : (
-              <p className="text-center text-gray-600">No colleges found</p>
-            )}
+            ) : null}
           </div>
         </TabPanel>
       </Tabs>
 
       {pdfPreviewUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg relative max-w-3xl w-full">
+        <div className="pdf-preview-overlay">
+          <div className="pdf-preview-modal">
             <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+              className="pdf-preview-close-btn"
               onClick={() => setPdfPreviewUrl(null)}
             >
               ✖
@@ -235,16 +243,11 @@ export default function FundsTabs({ universities }) {
             <h2 className="text-xl font-bold mb-4">PDF Preview</h2>
             <iframe
               src={pdfPreviewUrl}
-              width="100%"
-              height="500px"
               title="PDF Preview"
-              className="border"
+              className="pdf-preview-iframe"
             />
-            <div className="text-right mt-4">
-              <button
-                className="text-[15px] font-bold py-2 px-4 bg-blue-500 text-white rounded"
-                onClick={handleDownloadPDF}
-              >
+            <div className="pdf-preview-download-btn">
+              <button onClick={handleDownloadPDF}>
                 Download PDF
               </button>
             </div>
