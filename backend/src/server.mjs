@@ -23,7 +23,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const uri = 'mongodb://localhost:27017';
-const client = new MongoClient(uri, { useNewUrlParser: true});
+const client = new MongoClient(uri);
 let collection;
 let usersCollection;
 let recommendedCollegesCollection;
@@ -102,6 +102,13 @@ app.get('/api/user',async (req, res) => {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, '../build'))); // Adjust path if needed
+
+// Handle any unmatched routes by sending the index.html file from the frontend build
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
 const uploadsDir = path.join(__dirname, 'uploads');
 
 async function insertCsvDataToDb(filePath, collection) {
