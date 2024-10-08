@@ -1,0 +1,42 @@
+{
+  "files": {
+    "main.css": "/static/css/main.c44a96e1.css",
+    "main.js": "/static/js/main.96ed6044.js",
+    "static/js/239.fcaddd2b.chunk.js": "/static/js/239.fcaddd2b.chunk.js",
+    "static/js/213.1daaa267.chunk.js": "/static/js/213.1daaa267.chunk.js",
+    "static/js/455.b7ea72f9.chunk.js": "/static/js/455.b7ea72f9.chunk.js",
+    "static/media/discover_2.png": "/static/media/discover_2.25feb1f3ace46ac134da.png",
+    "static/media/front_world.png": "/static/media/front_world.0b7f48dbd52f05623544.png",
+    "static/media/discover_1.png": "/static/media/discover_1.c95b6ff83eb0e4b736a1.png",
+    "static/media/funds_6.png": "/static/media/funds_6.01f394191de6164564b2.png",
+    "static/media/funds_1.png": "/static/media/funds_1.50bec3cbad3a4610c7ec.png",
+    "static/media/discover_3.png": "/static/media/discover_3.dcdf6c56031989642de7.png",
+    "static/media/funds_8.png": "/static/media/funds_8.f2d203da5d78fe3a145d.png",
+    "static/media/funds_7.png": "/static/media/funds_7.b12f6c5aae0d5745f9f1.png",
+    "static/media/funds_4.png": "/static/media/funds_4.6b8a2b3f558497e5a51d.png",
+    "static/media/funds_2.png": "/static/media/funds_2.f9999175d375856b02ef.png",
+    "static/media/funds_3.png": "/static/media/funds_3.4863020faa6fee139d73.png",
+    "static/media/funds_5.png": "/static/media/funds_5.1636e78129f2944918ee.png",
+    "static/media/news_2.png": "/static/media/news_2.8b9a45c6d4ddeee96efa.png",
+    "static/media/news_3.png": "/static/media/news_3.f812e448737081d43e27.png",
+    "static/media/news_4.png": "/static/media/news_4.52fe1fbbcbeacdd356a0.png",
+    "static/media/news_5.png": "/static/media/news_5.1b2346834bf10e85c27e.png",
+    "static/media/logo.jpg": "/static/media/logo.1c95c13756ef6e9763e4.jpg",
+    "static/media/quiz_illustration.png": "/static/media/quiz_illustration.98df4324d2cbd7158906.png",
+    "static/media/quiz_bg.png": "/static/media/quiz_bg.d0b9dab21890b151af5e.png",
+    "static/media/how_1.png": "/static/media/how_1.0dd63cd6b9f7ad1b929d.png",
+    "static/media/how_2.png": "/static/media/how_2.1f23c1f786a1a8f55926.png",
+    "static/media/how_4.png": "/static/media/how_4.3e2e0d39a904a6c6be55.png",
+    "static/media/how_3.png": "/static/media/how_3.9c1cd2c0c6a738e1c02c.png",
+    "index.html": "/index.html",
+    "main.c44a96e1.css.map": "/static/css/main.c44a96e1.css.map",
+    "main.96ed6044.js.map": "/static/js/main.96ed6044.js.map",
+    "239.fcaddd2b.chunk.js.map": "/static/js/239.fcaddd2b.chunk.js.map",
+    "213.1daaa267.chunk.js.map": "/static/js/213.1daaa267.chunk.js.map",
+    "455.b7ea72f9.chunk.js.map": "/static/js/455.b7ea72f9.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c44a96e1.css",
+    "static/js/main.96ed6044.js"
+  ]
+}

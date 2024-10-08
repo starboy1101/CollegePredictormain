@@ -103,11 +103,11 @@ app.get('/api/user',async (req, res) => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, '../build'))); // Adjust path if needed
+app.use(express.static(path.join(__dirname, 'build')));
 
-// Handle any unmatched routes by sending the index.html file from the frontend build
+// Handle all requests to serve the React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 const uploadsDir = path.join(__dirname, 'uploads');
 
