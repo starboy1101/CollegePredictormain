@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "build": "babel src -d dist"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,9 @@
     "portfinder": "^1.0.32"
   },
   "devDependencies": {
+    "@babel/cli": "^7.25.7",
+    "@babel/core": "^7.25.7",
+    "@babel/preset-env": "^7.25.7",
     "@types/node": "^22.5.1"
   }
 }
